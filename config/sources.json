@@ -1,0 +1,194 @@
+{
+  "sources": [
+    { "type": "openfema-declarations", "intervalSeconds": 60 },
+    { "type": "openfema-areas", "intervalSeconds": 120 },
+    { "type": "sba-declarations", "intervalSeconds": 300 },
+
+    { "type": "rss", "id": "whitehouse-actions", "name": "White House (Presidential Actions)", "url": "https://www.whitehouse.gov/presidential-actions/feed/", "level": "federal", "intervalSeconds": 30 },
+    { "type": "rss", "id": "whitehouse-briefings", "name": "White House (Briefings & Statements)", "url": "https://www.whitehouse.gov/briefings-statements/feed/", "level": "federal", "intervalSeconds": 30 },
+
+    { "type": "rss", "id": "al-press", "name": "Alabama Governor (press releases)", "url": "https://governor.alabama.gov/newsroom/category/press-releases/feed/", "state": "AL", "level": "state" },
+    { "type": "rss", "id": "al-orders", "name": "Alabama Governor (executive orders)", "url": "https://governor.alabama.gov/newsroom/category/executive-orders/feed/", "state": "AL", "level": "state", "intervalSeconds": 120 },
+    { "type": "rss", "id": "al-emergencies", "name": "Alabama Governor (states of emergency)", "url": "https://governor.alabama.gov/newsroom/category/state-of-emergency/feed/", "state": "AL", "level": "state", "mode": "declarations" },
+
+    { "type": "rss", "id": "ak-press", "name": "Alaska Governor (newsroom)", "url": "https://gov.alaska.gov/newsroom/feed/", "state": "AK", "level": "state" },
+    { "type": "rss", "id": "ak-orders", "name": "Alaska Governor (administrative orders)", "url": "https://gov.alaska.gov/administrative-orders/feed/", "state": "AK", "level": "state", "intervalSeconds": 120 },
+    { "type": "page", "id": "ak-em", "name": "Alaska DHS&EM (public information)", "url": "https://ready.alaska.gov/PublicInformation", "state": "AK", "intervalSeconds": 120 },
+
+    { "type": "rss", "id": "az-press", "name": "Arizona Governor (news releases)", "url": "https://azgovernor.gov/rss.xml", "state": "AZ", "level": "state" },
+    { "type": "page", "id": "az-orders", "name": "Arizona Governor (executive orders)", "url": "https://azgovernor.gov/executive-orders", "state": "AZ", "intervalSeconds": 120 },
+
+    { "type": "page", "id": "ar-press", "name": "Arkansas Governor (newsroom)", "url": "https://governor.arkansas.gov/newsroom/", "state": "AR" },
+    { "type": "rss", "id": "ar-em", "name": "Arkansas DPS / ADEM", "url": "https://dps.arkansas.gov/feed/", "state": "AR", "level": "state", "intervalSeconds": 90 },
+
+    { "type": "rss", "id": "ca-press", "name": "California Governor", "url": "https://www.gov.ca.gov/feed/", "state": "CA", "level": "state" },
+    { "type": "page", "id": "ca-proclamations", "name": "Cal OES (emergency proclamations)", "url": "https://www.caloes.ca.gov/office-of-the-director/policy-administration/legal-affairs/emergency-proclamations/", "state": "CA", "linkPattern": "Proclamations", "mode": "declarations", "intervalSeconds": 90 },
+    { "type": "rss", "id": "ca-em", "name": "Cal OES Newsroom", "url": "https://news.caloes.ca.gov/feed/", "state": "CA", "level": "state", "intervalSeconds": 90 },
+
+    { "type": "page", "id": "co-press", "name": "Colorado Governor (news)", "url": "https://www.colorado.gov/governor/news", "state": "CO", "browserUserAgent": true },
+    { "type": "page", "id": "co-disaster-orders", "name": "Colorado Governor (D-series disaster orders)", "url": "https://www.colorado.gov/governor/2026-executive-orders", "state": "CO", "textPattern": "^D\\s*20\\d\\d", "mode": "declarations", "inspect": false, "browserUserAgent": true, "intervalSeconds": 120 },
+    { "type": "page", "id": "co-em", "name": "Colorado DHSEM (state disasters)", "url": "https://mars.colorado.gov/state-disasters-0", "state": "CO", "browserUserAgent": true, "intervalSeconds": 300 },
+
+    { "type": "page", "id": "ct-press", "name": "Connecticut Governor (press releases)", "url": "https://portal.ct.gov/governor/news/press-releases?language=en_US", "state": "CT" },
+    { "type": "page", "id": "ct-orders", "name": "Connecticut Governor (executive orders)", "url": "https://portal.ct.gov/governor/governors-actions/executive-orders", "state": "CT", "intervalSeconds": 120 },
+    { "type": "page", "id": "ct-em", "name": "Connecticut DESPP (news)", "url": "https://portal.ct.gov/despp/News-and-events?language=en_US", "state": "CT", "intervalSeconds": 90 },
+
+    { "type": "rss", "id": "de-press", "name": "Delaware Governor (press releases)", "url": "https://governor.delaware.gov/press-releases/feed/", "state": "DE", "level": "state" },
+    { "type": "page", "id": "de-orders", "name": "Delaware Governor (executive orders)", "url": "https://governor.delaware.gov/executive-orders/", "state": "DE", "linkPattern": "/executive-orders/executive-order-", "intervalSeconds": 120 },
+    { "type": "rss", "id": "de-em", "name": "Delaware DEMA", "url": "https://news.delaware.gov/category/safety-and-homeland-security/dema/feed/", "state": "DE", "level": "state", "intervalSeconds": 90, "summaryChars": 0 },
+
+    { "type": "page", "id": "fl-press", "name": "Florida Governor (press)", "url": "https://www.flgov.com/eog/news/press", "state": "FL" },
+    { "type": "page", "id": "fl-orders", "name": "Florida Governor (executive orders)", "url": "https://www.flgov.com/eog/news/executive-orders", "state": "FL", "intervalSeconds": 90 },
+    { "type": "page", "id": "fl-em", "name": "Florida Division of Emergency Management (news)", "url": "https://www.floridadisaster.org/news-media/news/", "state": "FL", "intervalSeconds": 90 },
+
+    { "type": "rss", "id": "ga-press", "name": "Georgia Governor", "url": "https://gov.georgia.gov/rss.xml", "state": "GA", "level": "state" },
+    { "type": "page", "id": "ga-orders", "name": "Georgia Governor (executive orders)", "url": "https://gov.georgia.gov/executive-action/executive-orders/2026", "state": "GA", "intervalSeconds": 180 },
+    { "type": "rss", "id": "ga-em", "name": "Georgia EMA", "url": "https://gema.georgia.gov/rss.xml", "state": "GA", "level": "state", "intervalSeconds": 90 },
+
+    { "type": "rss", "id": "hi-press", "name": "Hawaii Governor (newsroom)", "url": "https://governor.hawaii.gov/category/newsroom/feed/", "state": "HI", "level": "state" },
+    { "type": "rss", "id": "hi-proclamations", "name": "Hawaii Governor (emergency proclamations)", "url": "https://governor.hawaii.gov/category/newsroom/emergency-proclamations/feed/", "state": "HI", "level": "state", "mode": "declarations" },
+    { "type": "rss", "id": "hi-em", "name": "Hawaii EMA (news releases)", "url": "https://dod.hawaii.gov/hiema/category/news-release/feed/", "state": "HI", "level": "state", "intervalSeconds": 90 },
+
+    { "type": "rss", "id": "id-press", "name": "Idaho Governor (press releases)", "url": "https://gov.idaho.gov/pressrelease/feed/", "state": "ID", "level": "state" },
+    { "type": "rss", "id": "id-orders", "name": "Idaho Governor (executive orders)", "url": "https://gov.idaho.gov/executive-orders/feed/", "state": "ID", "level": "state", "intervalSeconds": 120 },
+    { "type": "rss", "id": "id-em", "name": "Idaho Office of Emergency Management", "url": "https://ioem.idaho.gov/feed/", "state": "ID", "level": "state", "intervalSeconds": 90 },
+
+    { "type": "json", "id": "il-press", "name": "Illinois Governor (newsroom)", "url": "https://gov.illinois.gov/content/soi/gov/en/newsroom/jcr:content/responsivegrid/container/container_293684588/container/news_feed.model.json", "itemsPath": "newsFeedItemList", "fields": { "title": "title", "link": "url", "date": "date", "summary": "description" }, "state": "IL", "level": "state" },
+    { "type": "page", "id": "il-orders", "name": "Illinois Governor (executive orders)", "url": "https://www.illinois.gov/government/executive-orders.html", "state": "IL", "linkPattern": "executive-order\\.executive-order-", "intervalSeconds": 300 },
+    { "type": "json", "id": "il-em", "name": "Illinois IEMA-OHS (press releases)", "url": "https://iemaohs.illinois.gov/content/soi/iemaohs/en/info/pressreleases/jcr:content/responsivegrid/container/container_293684588/container/news_feed.model.json", "itemsPath": "newsFeedItemList", "fields": { "title": "title", "link": "url", "date": "date", "summary": "description" }, "state": "IL", "level": "state", "intervalSeconds": 90 },
+
+    { "type": "json", "id": "in-press", "name": "Indiana Governor (press releases)", "url": "https://events.in.gov/api/2/events?type=34733410557561&days=-7&pp=50", "itemsPath": "events", "fields": { "title": "event.title", "link": "event.urlname", "date": "event.created_at", "summary": "event.description_text" }, "linkTemplate": "https://events.in.gov/event/{}", "state": "IN", "level": "state" },
+    { "type": "page", "id": "in-orders", "name": "Indiana Governor (executive orders)", "url": "https://www.in.gov/gov/newsroom/executive-orders/", "state": "IN", "intervalSeconds": 120 },
+    { "type": "page", "id": "in-em", "name": "Indiana DHS (emergency management)", "url": "https://www.in.gov/dhs/emergency-management-and-preparedness/", "state": "IN", "intervalSeconds": 180 },
+
+    { "type": "rss", "id": "ia-press", "name": "Iowa Governor (newsroom)", "url": "https://governor.iowa.gov/news/all/all/all/rss.xml", "state": "IA", "level": "state" },
+    { "type": "page", "id": "ia-orders", "name": "Iowa Governor (executive orders)", "url": "https://governor.iowa.gov/meet-governor-kim-reynolds/executive-orders", "state": "IA", "intervalSeconds": 120 },
+    { "type": "page", "id": "ia-proclamations", "name": "Iowa HSEMD (governor's disaster proclamations)", "url": "https://homelandsecurity.iowa.gov/state-iowa-governors-disaster-proclamations", "state": "IA", "mode": "declarations", "intervalSeconds": 90 },
+    { "type": "rss", "id": "ia-em", "name": "Iowa HSEMD (news)", "url": "https://homelandsecurity.iowa.gov/news/11/all/all/rss.xml", "state": "IA", "level": "state", "intervalSeconds": 90 },
+
+    { "type": "page", "id": "ks-press", "name": "Kansas Governor (press releases)", "url": "https://www.governor.ks.gov/newsroom/press-releases", "state": "KS" },
+    { "type": "page", "id": "ks-orders", "name": "Kansas Governor (executive orders)", "url": "https://www.governor.ks.gov/newsroom/executive-orders", "state": "KS", "intervalSeconds": 120 },
+    { "type": "page", "id": "ks-em", "name": "Kansas Division of Emergency Management (news)", "url": "https://www.kansastag.gov/m/newsflash?cat=7", "state": "KS", "intervalSeconds": 90 },
+
+    { "type": "rss", "id": "la-press", "name": "Louisiana Governor", "url": "https://gov.louisiana.gov/news/rss", "state": "LA", "level": "state" },
+    { "type": "rss", "id": "la-orders", "name": "Louisiana Governor (executive orders)", "url": "https://gov.louisiana.gov/news/rss?cat=11", "state": "LA", "level": "state", "intervalSeconds": 120 },
+    { "type": "page", "id": "la-em", "name": "Louisiana GOHSEP (news)", "url": "https://gohsep.la.gov/about/news/", "state": "LA", "intervalSeconds": 90 },
+
+    { "type": "rss", "id": "me-press", "name": "Maine Governor", "url": "https://www.maine.gov/governor/mills/rss.xml", "state": "ME", "level": "state" },
+    { "type": "page", "id": "me-orders", "name": "Maine Governor (official documents)", "url": "https://www.maine.gov/governor/mills/official_documents", "state": "ME", "intervalSeconds": 120 },
+    { "type": "page", "id": "me-em", "name": "Maine EMA (newsroom)", "url": "https://www.maine.gov/mema/ema-community/newsroom", "state": "ME", "intervalSeconds": 90 },
+
+    { "type": "page", "id": "md-press", "name": "Maryland Governor (press releases)", "url": "https://governor.maryland.gov/news/press-releases", "state": "MD" },
+    { "type": "page", "id": "md-orders", "name": "Maryland Governor (executive orders)", "url": "https://governor.maryland.gov/official-actions/executive-orders", "state": "MD", "intervalSeconds": 120 },
+
+    { "type": "page", "id": "ma-press", "name": "Massachusetts Governor (news)", "url": "https://www.mass.gov/orgs/governor-maura-healey-and-lt-governor-kim-driscoll/news", "state": "MA" },
+    { "type": "page", "id": "ma-orders", "name": "Massachusetts Governor (executive orders)", "url": "https://www.mass.gov/lists/governor-healeys-executive-orders", "state": "MA", "intervalSeconds": 120 },
+    { "type": "page", "id": "ma-em", "name": "Massachusetts MEMA (news)", "url": "https://www.mass.gov/orgs/massachusetts-emergency-management-agency/news", "state": "MA", "intervalSeconds": 90 },
+
+    { "type": "rss", "id": "ms-press", "name": "Mississippi Governor", "url": "https://governorreeves.ms.gov/feed/", "state": "MS", "level": "state" },
+    { "type": "page", "id": "ms-orders", "name": "Mississippi SOS (executive orders)", "url": "https://www.sos.ms.gov/publications-external-affairs/executive-orders", "state": "MS", "intervalSeconds": 300 },
+    { "type": "page", "id": "ms-em", "name": "Mississippi MEMA (news)", "url": "https://www.msema.org/news", "state": "MS", "intervalSeconds": 90 },
+
+    { "type": "rss", "id": "mo-press", "name": "Missouri Governor", "url": "https://governor.mo.gov/rss.xml", "state": "MO", "level": "state" },
+    { "type": "page", "id": "mo-orders", "name": "Missouri Governor (executive orders)", "url": "https://governor.mo.gov/actions/executive-orders", "state": "MO", "intervalSeconds": 120 },
+    { "type": "page", "id": "mo-em", "name": "Missouri SEMA (news)", "url": "https://sema.dps.mo.gov/newspubs/", "state": "MO", "intervalSeconds": 90 },
+
+    { "type": "json", "id": "mt-press", "name": "Montana Governor (news)", "url": "https://news.mt.gov/Governors-Office/articles.json", "fields": { "title": "title", "link": "link", "date": "date", "summary": "summary" }, "state": "MT", "level": "state" },
+    { "type": "page", "id": "mt-orders", "name": "Montana Governor (executive orders)", "url": "https://gov.mt.gov/Documents/GovernorsOffice/executiveorders/", "state": "MT", "intervalSeconds": 300, "timeoutSeconds": 45 },
+    { "type": "page", "id": "mt-em", "name": "Montana DES", "url": "https://des.mt.gov/", "state": "MT", "intervalSeconds": 120 },
+
+    { "type": "rss", "id": "ne-press", "name": "Nebraska Governor", "url": "https://governor.nebraska.gov/rss.xml", "state": "NE", "level": "state" },
+    { "type": "page", "id": "ne-orders", "name": "Nebraska Governor (executive orders index)", "url": "https://govdocs.nebraska.gov/docs/pilot/pubs/eoindex.html", "state": "NE", "intervalSeconds": 180 },
+    { "type": "page", "id": "ne-em", "name": "Nebraska NEMA", "url": "https://nema.nebraska.gov/", "state": "NE", "intervalSeconds": 90 },
+
+    { "type": "page", "id": "nv-press", "name": "Nevada Governor (press releases)", "url": "https://www.gov.nv.gov/press-releases/", "state": "NV" },
+    { "type": "page", "id": "nv-orders", "name": "Nevada Governor (2026 executive orders)", "url": "https://www.gov.nv.gov/executive-actions/executive-orders/2026-executive-orders/", "state": "NV", "intervalSeconds": 120 },
+    { "type": "page", "id": "nv-em", "name": "Nevada Division of Emergency Management", "url": "https://www.oem.nv.gov/", "state": "NV", "intervalSeconds": 90 },
+
+    { "type": "page", "id": "nh-em", "name": "New Hampshire HSEM", "url": "https://www.hsem.dos.nh.gov/", "state": "NH", "intervalSeconds": 90 },
+
+    { "type": "page", "id": "nj-press", "name": "New Jersey Governor (2026 news archive)", "url": "https://www.nj.gov/governor/news/2026/approved/news_archive.shtml", "state": "NJ" },
+    { "type": "page", "id": "nj-orders", "name": "New Jersey Governor (executive orders)", "url": "https://nj.gov/infobank/eo/057sherrill/approved/eo_archive.shtml", "state": "NJ", "intervalSeconds": 90 },
+    { "type": "page", "id": "nj-em", "name": "New Jersey OEM (Ready NJ news)", "url": "https://ready.nj.gov/news/", "state": "NJ", "intervalSeconds": 90 },
+
+    { "type": "page", "id": "nm-press", "name": "New Mexico Governor (press releases)", "url": "https://www.governor.state.nm.us/press-releases/", "state": "NM" },
+    { "type": "page", "id": "nm-orders", "name": "New Mexico Governor (executive orders)", "url": "https://www.governor.state.nm.us/about-the-governor/executive-orders/", "state": "NM", "intervalSeconds": 180 },
+    { "type": "rss", "id": "nm-em", "name": "New Mexico DHSEM", "url": "https://www.dhsem.nm.gov/feed/", "state": "NM", "level": "state", "intervalSeconds": 90 },
+
+    { "type": "page", "id": "ny-press", "name": "New York Governor (news)", "url": "https://www.governor.ny.gov/news", "state": "NY" },
+    { "type": "page", "id": "ny-orders", "name": "New York Governor (executive orders)", "url": "https://www.governor.ny.gov/executiveorders", "state": "NY", "linkPattern": "/executive-order/", "intervalSeconds": 90 },
+    { "type": "rss", "id": "ny-em", "name": "New York DHSES", "url": "https://www.dhses.ny.gov/rss.xml", "state": "NY", "level": "state", "intervalSeconds": 90 },
+
+    { "type": "rss", "id": "nc-press", "name": "North Carolina Governor", "url": "https://governor.nc.gov/news/feed", "state": "NC", "level": "state" },
+    { "type": "page", "id": "nc-orders", "name": "North Carolina Governor (executive orders)", "url": "https://governor.nc.gov/news/executive-orders", "state": "NC", "intervalSeconds": 90 },
+    { "type": "rss", "id": "nc-em", "name": "North Carolina DPS / NCEM", "url": "https://www.ncdps.gov/news/feed", "state": "NC", "level": "state", "intervalSeconds": 90 },
+
+    { "type": "rss", "id": "nd-press", "name": "North Dakota Governor", "url": "https://www.governor.nd.gov/rss/news", "state": "ND", "level": "state" },
+    { "type": "page", "id": "nd-orders", "name": "North Dakota Governor (executive orders)", "url": "https://www.governor.nd.gov/executive-orders", "state": "ND", "intervalSeconds": 90 },
+    { "type": "rss", "id": "nd-em", "name": "North Dakota DES", "url": "https://www.des.nd.gov/rss/news", "state": "ND", "level": "state", "intervalSeconds": 90 },
+
+    { "type": "page", "id": "oh-press", "name": "Ohio Governor (news)", "url": "https://governor.ohio.gov/media/news-and-media", "state": "OH", "browserUserAgent": true },
+    { "type": "page", "id": "oh-em", "name": "Ohio EMA", "url": "https://ema.ohio.gov/home/home", "state": "OH", "browserUserAgent": true, "intervalSeconds": 90 },
+
+    { "type": "json", "id": "ok-press", "name": "Oklahoma Governor (newsroom)", "url": "https://oklahoma.gov/content/sok-wcm/en/governor/newsroom/newsroom/jcr:content/responsivegrid-second/newslisting.json", "itemsPath": "items", "fields": { "title": "title", "link": "newsUrl", "date": "lastModified" }, "state": "OK", "level": "state" },
+    { "type": "page", "id": "ok-orders", "name": "Oklahoma SOS (executive orders)", "url": "https://www.sos.ok.gov/gov/execorders.aspx", "state": "OK", "intervalSeconds": 120 },
+    { "type": "page", "id": "ok-em", "name": "Oklahoma OEM (2026 emergencies and disasters)", "url": "https://oklahoma.gov/oem/emergencies-and-disasters/2026.html", "state": "OK", "linkPattern": "/emergencies-and-disasters/2026/", "mode": "declarations", "intervalSeconds": 90 },
+
+    { "type": "page", "id": "or-press", "name": "Oregon Governor (newsroom)", "url": "https://apps.oregon.gov/oregon-newsroom/OR/GOV/Posts", "state": "OR" },
+    { "type": "page", "id": "or-em", "name": "Oregon OEM (newsroom)", "url": "https://apps.oregon.gov/oregon-newsroom/OR/OEM/Posts", "state": "OR", "intervalSeconds": 90 },
+
+    { "type": "json", "id": "pa-press", "name": "Pennsylvania Governor (newsroom)", "url": "https://commonwealthofpennsylvaniaproductiono8jd9ckm.org.coveo.com/rest/search/v2?organizationId=commonwealthofpennsylvaniaproductiono8jd9ckm", "headers": { "authorization": "Bearer xx4e57cda9-3464-437d-9375-b947ca6b72c8" }, "body": { "aq": "@copapwpagency==\"Governor's Office\" @copapwpcontenttype==News", "numberOfResults": 25, "sortCriteria": "@copapwpeffectivedate descending" }, "itemsPath": "results", "fields": { "title": "raw.copapwptitle", "link": "clickUri", "date": "raw.copapwpeffectivedate", "summary": "raw.copapwpdescription" }, "state": "PA", "level": "state" },
+    { "type": "page", "id": "pa-proclamations", "name": "PEMA (emergency proclamations)", "url": "https://www.pa.gov/agencies/pema/resources/emergency-proclamations", "state": "PA", "linkPattern": "governor-proclamations", "mode": "declarations", "intervalSeconds": 90 },
+    { "type": "json", "id": "pa-em", "name": "PEMA (newsroom)", "url": "https://commonwealthofpennsylvaniaproductiono8jd9ckm.org.coveo.com/rest/search/v2?organizationId=commonwealthofpennsylvaniaproductiono8jd9ckm", "headers": { "authorization": "Bearer xx4e57cda9-3464-437d-9375-b947ca6b72c8" }, "body": { "aq": "@copapwpagency==\"Pennsylvania Emergency Management Agency\" @copapwpcontenttype==News", "numberOfResults": 25, "sortCriteria": "@copapwpeffectivedate descending" }, "itemsPath": "results", "fields": { "title": "raw.copapwptitle", "link": "clickUri", "date": "raw.copapwpeffectivedate", "summary": "raw.copapwpdescription" }, "state": "PA", "level": "state", "intervalSeconds": 90 },
+
+    { "type": "rss", "id": "ri-press", "name": "Rhode Island Governor", "url": "https://governor.ri.gov/rss.xml", "state": "RI", "level": "state" },
+    { "type": "page", "id": "ri-em", "name": "Rhode Island EMA (press)", "url": "https://www.ri.gov/press/?agency_id=20", "state": "RI", "intervalSeconds": 90 },
+
+    { "type": "page", "id": "sc-press", "name": "South Carolina Governor (news)", "url": "https://governor.sc.gov/news", "state": "SC" },
+    { "type": "page", "id": "sc-orders", "name": "South Carolina Governor (executive orders)", "url": "https://governor.sc.gov/executive-branch/executive-orders", "state": "SC", "linkPattern": "FILED", "intervalSeconds": 180 },
+    { "type": "page", "id": "sc-em", "name": "South Carolina EMD (2026 news releases)", "url": "https://www.scemd.org/stay-informed/news-releases/2026-news-releases/", "state": "SC", "intervalSeconds": 90 },
+
+    { "type": "page", "id": "sd-orders", "name": "South Dakota SOS (executive orders)", "url": "https://sdsos.gov/general-information/executive-actions/executive-orders/search/Default.aspx", "state": "SD", "intervalSeconds": 180 },
+
+    { "type": "page", "id": "tn-press", "name": "Tennessee Governor (news)", "url": "https://www.tn.gov/governor/news.html", "state": "TN" },
+    { "type": "page", "id": "tn-orders", "name": "Tennessee SOS (Governor Lee executive orders)", "url": "https://sos.tn.gov/publications/services/executive-orders-governor-bill-lee", "state": "TN", "browserUserAgent": true, "intervalSeconds": 120 },
+    { "type": "page", "id": "tn-em", "name": "TEMA (news)", "url": "https://www.tn.gov/tema/news.html", "state": "TN", "intervalSeconds": 90 },
+
+    { "type": "rss", "id": "tx-press", "name": "Texas Governor", "url": "https://gov.texas.gov/news/rss", "state": "TX", "level": "state", "intervalSeconds": 90, "timeoutSeconds": 45 },
+    { "type": "page", "id": "tx-proclamations", "name": "Texas Governor (proclamations)", "url": "https://gov.texas.gov/news/category/proclamation", "state": "TX", "linkPattern": "/news/post/", "intervalSeconds": 120, "timeoutSeconds": 45 },
+    { "type": "page", "id": "tx-em", "name": "Texas Division of Emergency Management", "url": "https://www.tdem.texas.gov/", "state": "TX", "intervalSeconds": 90 },
+
+    { "type": "rss", "id": "ut-press", "name": "Utah Governor (press releases)", "url": "https://governor.utah.gov/category/press-release/feed/", "state": "UT", "level": "state" },
+    { "type": "rss", "id": "ut-declarations", "name": "Utah Governor (declarations)", "url": "https://governor.utah.gov/declarations/feed/", "state": "UT", "level": "state", "intervalSeconds": 120 },
+    { "type": "rss", "id": "ut-em", "name": "Utah Division of Emergency Management", "url": "https://dem.utah.gov/feed/", "state": "UT", "level": "state", "intervalSeconds": 90 },
+
+    { "type": "rss", "id": "vt-press", "name": "Vermont Governor (press releases)", "url": "https://governor.vermont.gov/taxonomy/term/3/feed", "state": "VT", "level": "state" },
+    { "type": "rss", "id": "vt-orders", "name": "Vermont Governor (executive orders)", "url": "https://governor.vermont.gov/taxonomy/term/17/feed", "state": "VT", "level": "state", "intervalSeconds": 90 },
+    { "type": "rss", "id": "vt-em", "name": "Vermont Emergency Management", "url": "https://vem.vermont.gov/rss.xml", "state": "VT", "level": "state", "intervalSeconds": 90 },
+
+    { "type": "json", "id": "va-press", "name": "Virginia Governor (news releases)", "url": "https://www.governor.virginia.gov/newsroom/news-releases/govnewsfeed.php/?", "fields": { "title": "headline", "link": "link", "date": "date", "summary": "brief" }, "state": "VA", "level": "state" },
+    { "type": "page", "id": "va-orders", "name": "Virginia Governor (executive actions)", "url": "https://www.governor.virginia.gov/executive-actions/", "state": "VA", "intervalSeconds": 90 },
+    { "type": "page", "id": "va-em", "name": "Virginia VDEM", "url": "https://www.vdem.virginia.gov/", "state": "VA", "intervalSeconds": 90 },
+
+    { "type": "rss", "id": "wa-press", "name": "Washington Governor", "url": "https://governor.wa.gov/rss.xml", "state": "WA", "level": "state" },
+    { "type": "page", "id": "wa-orders", "name": "Washington Governor (executive orders)", "url": "https://governor.wa.gov/office-governor/office/official-actions/executive-orders", "state": "WA", "intervalSeconds": 120 },
+    { "type": "page", "id": "wa-em", "name": "Washington EMD", "url": "https://mil.wa.gov/emergency-management-division", "state": "WA", "intervalSeconds": 90 },
+
+    { "type": "rss", "id": "wv-press", "name": "West Virginia Governor", "url": "https://governor.wv.gov/rss.xml", "state": "WV", "level": "state" },
+    { "type": "page", "id": "wv-orders", "name": "West Virginia Governor (executive orders)", "url": "https://governor.wv.gov/executive-orders", "state": "WV", "intervalSeconds": 90 },
+    { "type": "page", "id": "wv-em", "name": "West Virginia EMD", "url": "https://emd.wv.gov/", "state": "WV", "intervalSeconds": 90 },
+
+    { "type": "page", "id": "wi-press", "name": "Wisconsin Governor (press releases, 3.5 MB page)", "url": "https://evers.wi.gov/Pages/Newsroom/Press-Releases.aspx", "state": "WI", "intervalSeconds": 600 },
+    { "type": "page", "id": "wi-orders", "name": "Wisconsin Governor (executive orders)", "url": "https://evers.wi.gov/Pages/Newsroom/Executive-Orders.aspx", "state": "WI", "intervalSeconds": 180 },
+    { "type": "rss", "id": "wi-em", "name": "Wisconsin Emergency Management", "url": "https://wem.wi.gov/feed/", "state": "WI", "level": "state", "intervalSeconds": 90 },
+
+    { "type": "json", "id": "wy-press", "name": "Wyoming Governor (news releases)", "url": "https://governor.wyo.gov/api/cms/graphql", "body": { "query": "query($p:String!){pressReleasesByDate(parameters:$p){path displayText releaseDate}}", "variables": { "p": "{}" } }, "itemsPath": "data.pressReleasesByDate", "fields": { "title": "displayText", "link": "path", "date": "releaseDate" }, "linkTemplate": "https://governor.wyo.gov/news-releases/{}", "state": "WY", "level": "state" },
+
+    { "type": "google-news", "id": "news-state-of-emergency", "query": "\"state of emergency\" (declares OR declared OR declaring OR issues OR signs) when:1d" },
+    { "type": "google-news", "id": "news-declarations", "query": "(\"disaster declaration\" OR \"emergency declaration\" OR \"disaster proclamation\" OR \"emergency proclamation\") when:1d" },
+    { "type": "google-news", "id": "news-federal", "query": "(\"major disaster declaration\" OR \"federal emergency declaration\" OR \"fire management assistance\") (approves OR approved OR grants OR declares OR requests) when:2d" },
+    { "type": "google-news", "id": "news-local", "query": "(\"local emergency\" OR \"local state of emergency\" OR \"disaster emergency\" OR \"declaration of emergency\") (county OR city OR mayor OR supervisors OR commissioners OR parish) when:1d" },
+    { "type": "google-news", "id": "news-declares-disaster", "query": "(\"declares disaster\" OR \"declares emergency\" OR \"declared a disaster\" OR \"declared an emergency\") when:1d" },
+    { "type": "google-news", "id": "news-blocked-states", "query": "(\"state of emergency\" OR \"disaster declaration\" OR \"emergency declaration\" OR \"executive order\") (Minnesota OR Michigan OR Kentucky OR \"New Hampshire\" OR \"South Dakota\" OR Arizona OR Wyoming) governor when:1d" }
+  ]
+}
