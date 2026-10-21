@@ -10,6 +10,7 @@ import { runSmokeTest } from "./smoke.ts";
 import { Scheduler } from "./scheduler.ts";
 import { startServer } from "./server.ts";
 import { loadSources } from "./sources/index.ts";
+import { applyDashboardRecipients } from "./recipients.ts";
 import { reportWatchRun } from "./status-portal.ts";
 import { Store } from "./store.ts";
 import type { Alert } from "./types.ts";
@@ -67,6 +68,7 @@ if (args.has("--daily")) {
   // For cron/launchd, which can call it often: once a day at or after DIGEST_TIME, poll every source once,
   // then email the digest covering everything since the previous send. --force skips the time check.
   const send = !args.has("--no-send");
+  await applyDashboardRecipients();
   if (send && !digestConfigured()) throw new Error("Configure email (MAIL_PROVIDER=gmail with GMAIL_* settings, or SMTP_*) and set DIGEST_TO.");
   const clock = localClock(new Date(), config.digest.tz);
   const due = clock.minutes >= parseTime(config.digest.time) && store.getMeta("daily_date") !== clock.date;

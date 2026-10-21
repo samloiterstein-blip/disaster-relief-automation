@@ -2,9 +2,9 @@ name: Daily digest
 
 on:
   schedule:
-    # 17:00 America/New_York in both EDT and EST. --daily no-ops if it is early or already sent.
-    - cron: "15 21 * * *"
-    - cron: "15 22 * * *"
+    # 15:00 America/New_York in both EDT and EST. --daily no-ops if it is early or already sent.
+    - cron: "15 19 * * *"
+    - cron: "15 20 * * *"
   workflow_dispatch:
     inputs:
       force:
@@ -44,6 +44,7 @@ jobs:
           DIGEST_TO: ${{ secrets.DIGEST_TO }}
           DIGEST_CC: ${{ secrets.DIGEST_CC }}
           DIGEST_FROM: ${{ secrets.DIGEST_FROM }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
           MAIL_PROVIDER: ${{ secrets.MAIL_PROVIDER }}
           GMAIL_CLIENT_ID: ${{ secrets.GMAIL_CLIENT_ID }}
           GMAIL_CLIENT_SECRET: ${{ secrets.GMAIL_CLIENT_SECRET }}

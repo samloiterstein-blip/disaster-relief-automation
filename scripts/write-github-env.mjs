@@ -16,6 +16,7 @@ const optional = [
   "SMTP_PORT",
   "SMTP_USER",
   "SMTP_PASS",
+  "DATABASE_URL",
   "DIGEST_CC",
   "DIGEST_FROM",
   "DIGEST_TIME",
@@ -55,7 +56,7 @@ if (provider === "gmail") {
 const lines = [
   "DATA_DIR=./data",
   `MAIL_PROVIDER=${provider}`,
-  "DIGEST_TIME=17:00",
+  "DIGEST_TIME=15:00",
   "DIGEST_TZ=America/New_York",
 ];
 
