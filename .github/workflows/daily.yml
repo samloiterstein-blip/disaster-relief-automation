@@ -1,0 +1,77 @@
+name: Daily digest
+
+on:
+  schedule:
+    # 17:00 America/New_York in both EDT and EST. --daily no-ops if it is early or already sent.
+    - cron: "15 21 * * *"
+    - cron: "15 22 * * *"
+  workflow_dispatch:
+    inputs:
+      force:
+        description: Send even if today's digest already went out
+        type: boolean
+        default: false
+
+concurrency:
+  group: disaster-daily
+  cancel-in-progress: false
+
+jobs:
+  digest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Restore watch database
+        uses: actions/cache@v4
+        with:
+          path: data
+          key: watch-db-${{ github.run_id }}
+          restore-keys: |
+            watch-db-
+      - name: Write production env
+        env:
+          USER_AGENT: ${{ secrets.USER_AGENT }}
+          STATUS_PORTAL_URL: ${{ secrets.STATUS_PORTAL_URL }}
+          STATUS_INGEST_TOKEN: ${{ secrets.STATUS_INGEST_TOKEN }}
+          DIGEST_TO: ${{ secrets.DIGEST_TO }}
+          DIGEST_CC: ${{ secrets.DIGEST_CC }}
+          DIGEST_FROM: ${{ secrets.DIGEST_FROM }}
+          MAIL_PROVIDER: ${{ secrets.MAIL_PROVIDER }}
+          GMAIL_CLIENT_ID: ${{ secrets.GMAIL_CLIENT_ID }}
+          GMAIL_CLIENT_SECRET: ${{ secrets.GMAIL_CLIENT_SECRET }}
+          GMAIL_REFRESH_TOKEN: ${{ secrets.GMAIL_REFRESH_TOKEN }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          WEBHOOK_URLS: ${{ secrets.WEBHOOK_URLS }}
+          WATCH_STATES: ${{ secrets.WATCH_STATES }}
+          ALERT_STATUSES: ${{ secrets.ALERT_STATUSES }}
+        run: node scripts/write-github-env.mjs
+      - name: Run daily watch
+        env:
+          TZ: America/New_York
+        run: |
+          mkdir -p data
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.force }}" = "true" ]; then
+            node src/index.ts --daily --force
+          else
+            node src/index.ts --daily
+          fi
+      - name: Keep a copy of the watch database
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: watch-db
+          path: data
+          if-no-files-found: ignore
+          retention-days: 30

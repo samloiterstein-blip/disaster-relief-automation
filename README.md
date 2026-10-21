@@ -73,19 +73,17 @@ Each digest covers the time since the previous one was sent, so a restart or a f
 
 `--digest-preview` and `--digest` cover the time since the last scheduled digest (or the last 24 hours) and don't change the schedule.
 
-### Once a day from cron or launchd, without the always-on service
+### Once a day from GitHub Actions, without the always-on service
 
 `node src/index.ts --daily` sends once per day, at or after `DIGEST_TIME` in `DIGEST_TZ`. It does nothing when called earlier, or again after that day's email has gone out, so it's safe to schedule often. When it's due, it waits up to 2 minutes for the network, polls every source once (retrying failures once after 10 seconds), and emails the digest covering everything since the previous email to `DIGEST_TO`, with `DIGEST_CC` copied. A failed send is retried twice; if it still fails, the next check tries again. `--force` sends regardless of the time; `--no-send` prints the digest instead.
 
-On this Mac, `~/Library/LaunchAgents/com.uschamber.disaster-watch.daily.plist` runs it every 10 minutes under `caffeinate -i`, so the email goes out at 3:00 PM Eastern when the Mac is awake, or at the first check after it wakes. It logs to `~/Library/Logs/disaster-watch/daily.log`.
+Production cron is `.github/workflows/daily.yml`. It runs at 17:00 America/New_York on GitHub-hosted runners and does not need a local Mac. The watch SQLite file is restored from Actions cache so a restart does not re-baseline every source. Set repository secrets `USER_AGENT`, `STATUS_PORTAL_URL`, `STATUS_INGEST_TOKEN`, `DIGEST_TO`, plus either the `GMAIL_*` keys or `SMTP_*` keys (`MAIL_PROVIDER` defaults to `gmail`). Use **Actions → Daily digest → Run workflow** to send immediately; check **force** to ignore the already-sent guard.
 
 ```bash
-launchctl print gui/$(id -u)/com.uschamber.disaster-watch.daily   # status and last exit code
 node src/index.ts --daily --force                                  # send today's email now
-launchctl bootout gui/$(id -u)/com.uschamber.disaster-watch.daily # turn it off
 ```
 
-The Mac has to be on and awake: a laptop asleep on battery at 3:00 PM sends late. Polling once a day means detection waits for the next run, and the job can open at most 5 linked documents per listing page per run.
+Polling once a day means detection waits for the next run, and the job can open at most 5 linked documents per listing page per run. Mac launchd is a fallback only.
 
 ## Smoke test
 
