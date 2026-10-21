@@ -19,8 +19,6 @@ const optional = [
   "DATABASE_URL",
   "DIGEST_CC",
   "DIGEST_FROM",
-  "DIGEST_TIME",
-  "DIGEST_TZ",
   "SLACK_WEBHOOK_URL",
   "WEBHOOK_URLS",
   "WATCH_STATES",
@@ -56,8 +54,8 @@ if (provider === "gmail") {
 const lines = [
   "DATA_DIR=./data",
   `MAIL_PROVIDER=${provider}`,
-  "DIGEST_TIME=15:00",
-  "DIGEST_TZ=America/New_York",
+  `DIGEST_TIME=${process.env.DIGEST_TIME?.trim() || "17:00"}`,
+  `DIGEST_TZ=${process.env.DIGEST_TZ?.trim() || "America/New_York"}`,
 ];
 
 for (const key of [...required, ...optional]) {
