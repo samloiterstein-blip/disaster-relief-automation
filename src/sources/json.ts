@@ -1,5 +1,5 @@
 import { assumedDeclaration, classify } from "../classify.ts";
-import { fetchJson } from "../http.ts";
+import { fetchJson, fetchText, HttpError } from "../http.ts";
 import type { Detection, Level, Source, Tier } from "../types.ts";
 
 export interface JsonSourceConfig {
@@ -9,6 +9,13 @@ export interface JsonSourceConfig {
   /** JSON body to POST (GraphQL, Coveo search). Omit for GET. */
   body?: unknown;
   headers?: Record<string, string>;
+  /**
+   * HTML page that publishes a search API token (e.g. Pennsylvania's Coveo `accessToken`).
+   * The token is scraped and sent as `Authorization: Bearer …`.
+   */
+  tokenFrom?: string;
+  /** Capture group 1 is the token. Defaults to a Coveo/JS `accessToken: '…'` assignment. */
+  tokenPattern?: string;
   /** Dot path to the item array; omit when the response is the array. */
   itemsPath?: string;
   /** Dot paths within each item. */
@@ -22,6 +29,39 @@ export interface JsonSourceConfig {
   maxAgeHours?: number;
   mode?: "classify" | "declarations";
   browserUserAgent?: boolean;
+}
+
+const DEFAULT_TOKEN_RE = /accessToken["']?\s*[:=]\s*["']([^"']+)/i;
+const tokenCache = new Map<string, { token: string; fetchedAt: number }>();
+const TOKEN_TTL_MS = 6 * 60 * 60 * 1000;
+
+export function extractAccessToken(html: string, pattern?: string): string | undefined {
+  return html.match(pattern ? new RegExp(pattern) : DEFAULT_TOKEN_RE)?.[1];
+}
+
+async function searchToken(cfg: JsonSourceConfig, force = false): Promise<string> {
+  const page = cfg.tokenFrom!;
+  const cached = tokenCache.get(page);
+  if (!force && cached && Date.now() - cached.fetchedAt < TOKEN_TTL_MS) return cached.token;
+  const html = await fetchText(page, { accept: "text/html,application/xhtml+xml", browserUserAgent: cfg.browserUserAgent ?? true, conditional: false });
+  const token = html ? extractAccessToken(html, cfg.tokenPattern) : undefined;
+  if (!token) throw new Error(`no search token found on ${page}`);
+  tokenCache.set(page, { token, fetchedAt: Date.now() });
+  return token;
+}
+
+async function requestJson(cfg: JsonSourceConfig): Promise<unknown | null> {
+  const headers = { ...cfg.headers };
+  if (cfg.tokenFrom) headers.authorization = `Bearer ${await searchToken(cfg)}`;
+  try {
+    return await fetchJson<unknown>(cfg.url, { body: cfg.body, headers, browserUserAgent: cfg.browserUserAgent });
+  } catch (err) {
+    if (cfg.tokenFrom && err instanceof HttpError && err.status === 401) {
+      headers.authorization = `Bearer ${await searchToken(cfg, true)}`;
+      return await fetchJson<unknown>(cfg.url, { body: cfg.body, headers, browserUserAgent: cfg.browserUserAgent });
+    }
+    throw err;
+  }
 }
 
 export function getPath(obj: unknown, path: string | undefined): unknown {
@@ -102,7 +142,7 @@ export function jsonSource(cfg: JsonSourceConfig): Source {
     intervalMs: (cfg.intervalSeconds ?? 60) * 1000,
     maxAgeHours: cfg.maxAgeHours ?? 48,
     async poll() {
-      const data = await fetchJson<unknown>(cfg.url, { body: cfg.body, headers: cfg.headers, browserUserAgent: cfg.browserUserAgent });
+      const data = await requestJson(cfg);
       if (data === null) return null;
       const detectedAt = new Date().toISOString();
       const detections: Detection[] = [];

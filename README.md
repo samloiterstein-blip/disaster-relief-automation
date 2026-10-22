@@ -130,8 +130,8 @@ By default, SMS only goes out for declarations that involve a government source 
 
 ## Known gaps
 
-- **20 of the 150 state pages can't be watched** (see the table below). Minnesota and Arizona's emergency agency run bot challenges (hCaptcha, Cloudflare), and this service doesn't try to get past them. Kentucky, Michigan, and parts of Ohio, Oregon, and Wyoming render their lists in JavaScript with no public API. New Hampshire returns 403 to automated clients. An extra Google News query targets these states.
-- **Browser user agent:** Colorado, Ohio, and the Tennessee Secretary of State reject non-browser clients on public pages, so those sources send a browser user agent (`"browserUserAgent": true`). Every other request identifies itself with `USER_AGENT`.
+- **20 of the 150 state pages can't be watched** (see the table below). Minnesota and Arizona's emergency agency run bot challenges (hCaptcha, Cloudflare), and this service doesn't try to get past them. Kentucky, Michigan, and parts of Ohio, Oregon, and Wyoming render their lists in JavaScript with no public API. New Hampshire's governor pages still return 403; HSEM is watched with a browser client. An extra Google News query targets these states.
+- **Browser user agent:** Colorado, Ohio, Kansas, Maine, Massachusetts, New Hampshire HSEM, Pennsylvania, Tennessee, and the Tennessee Secretary of State reject non-browser clients on public pages. Those sources send a Chrome-like header set (`"browserUserAgent": true`). Kansas emergency news uses the CivicEngage RSS feed because Cloudflare blocks the HTML newsflash. Pennsylvania's newsrooms publish a short-lived Coveo search token on the page; the poller reads that token instead of hardcoding one. Every other request identifies itself with `USER_AGENT`.
 - **Bandwidth:** HTML pages don't always support conditional requests, so page polling can download up to about 9 GB a day. That's roughly one request per minute per site. Wisconsin's 3.5 MB press page polls every 10 minutes for this reason.
 - **Local declarations** (about 3,000 counties and far more cities) have no central feed. Coverage depends on local press, so small jurisdictions may be missed or detected late.
 - **State detection** relies on state and governor names in headlines. Unrecognized events still alert, labeled "Unknown state".
@@ -159,7 +159,7 @@ How each state's three listed sources (governor press releases, executive orders
 | IL | API | page | API |
 | IN | API | page | page |
 | IA | feed | page | page (disaster proclamations) + news feed |
-| KS | page | page | page |
+| KS | page | page | feed |
 | KY | — (JavaScript-rendered) | — (no order list) | — (JavaScript-rendered) |
 | LA | feed | feed | page |
 | ME | feed | page | page |

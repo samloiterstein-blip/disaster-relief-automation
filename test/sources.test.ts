@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { createServer, type Server } from "node:http";
 import { after, before, test } from "node:test";
-import { extractItems, yearlessDate } from "../src/sources/json.ts";
+import { extractAccessToken, extractItems, yearlessDate } from "../src/sources/json.ts";
 import { extractLinks, pageSource, pastYearDate } from "../src/sources/page.ts";
 import { Store } from "../src/store.ts";
 
@@ -37,6 +37,12 @@ test("yearlessDate picks the most recent past year that matches the weekday", ()
   assert.equal(yearlessDate("Thursday, July 31", now), "2025-07-31T12:00:00.000Z");
   assert.equal(yearlessDate("December 15", now), "2025-12-15T12:00:00.000Z");
   assert.equal(yearlessDate("not a date", now), undefined);
+});
+
+test("extractAccessToken reads a Coveo token from page source", () => {
+  const html = `<script>const cfg = { organizationId: 'org', accessToken: 'xx4cfd4ffb-11d2-418f-984f-7eaacf843a3b' };</script>`;
+  assert.equal(extractAccessToken(html), "xx4cfd4ffb-11d2-418f-984f-7eaacf843a3b");
+  assert.equal(extractAccessToken("<html></html>"), undefined);
 });
 
 test("extractItems maps nested JSON and templated links", () => {

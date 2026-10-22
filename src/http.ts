@@ -8,8 +8,23 @@ interface Validators {
 
 const validators = new Map<string, Validators>();
 
-/** Some state sites (e.g. Colorado, Ohio) reject any client that doesn't look like a browser. */
-const BROWSER_UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36";
+/** Some state sites (Akamai, mass.gov, maine.gov, tn.gov) reject any client that doesn't look like a browser. */
+const BROWSER_UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36";
+
+const BROWSER_HEADERS: Record<string, string> = {
+  "user-agent": BROWSER_UA,
+  "accept-language": "en-US,en;q=0.9",
+  "cache-control": "no-cache",
+  "pragma": "no-cache",
+  "sec-ch-ua": `"Chromium";v="140", "Not=A?Brand";v="24", "Google Chrome";v="140"`,
+  "sec-ch-ua-mobile": "?0",
+  "sec-ch-ua-platform": `"macOS"`,
+  "sec-fetch-dest": "document",
+  "sec-fetch-mode": "navigate",
+  "sec-fetch-site": "none",
+  "sec-fetch-user": "?1",
+  "upgrade-insecure-requests": "1",
+};
 
 export class HttpError extends Error {
   status: number;
@@ -31,7 +46,7 @@ export interface FetchOptions {
 
 async function request(url: string, opts: FetchOptions): Promise<Response | null> {
   const headers: Record<string, string> = {
-    "user-agent": opts.browserUserAgent ? BROWSER_UA : config.userAgent,
+    ...(opts.browserUserAgent ? BROWSER_HEADERS : { "user-agent": config.userAgent }),
     accept: opts.accept ?? "*/*",
     ...opts.headers,
   };
