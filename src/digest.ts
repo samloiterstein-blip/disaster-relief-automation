@@ -4,6 +4,7 @@ import { mailConfigured, sendEmail } from "./mail.ts";
 import { alertWanted, KIND, LEVEL } from "./notify.ts";
 import { stateName } from "./states.ts";
 import type { AlertRow, SourceActivity, Store } from "./store.ts";
+import { probeGmailAuth, withGmailRefreshNotice } from "./gmail-refresh.ts";
 import type { Source } from "./types.ts";
 
 export interface Digest {
@@ -67,6 +68,52 @@ function summarize(alerts: AlertRow[]): string {
     .join(", ");
 }
 
+/** Stafford Act declarations and other government-posted declarations (not requests or press-only leads). */
+function isOfficialDeclaration(r: AlertRow): boolean {
+  if (r.status === "requested") return false;
+  if (r.type === "confirmed" || r.type === "amended") return true;
+  return r.official === 1;
+}
+
+/** Federal major disaster and emergency declarations first so they are never buried. */
+function officialDeclarationRank(r: AlertRow): number {
+  if (r.level === "federal" && r.kind === "major_disaster") return 0;
+  if (r.level === "federal" && r.kind === "emergency") return 1;
+  if (r.level === "federal" && r.kind === "fire_management") return 2;
+  if (r.level === "federal") return 3;
+  if (r.type === "confirmed") return 4;
+  if (r.level === "state") return 5;
+  if (r.level === "local") return 6;
+  return 7;
+}
+
+function sortOfficialDeclarations(rows: AlertRow[]): AlertRow[] {
+  return [...rows].sort((a, b) => officialDeclarationRank(a) - officialDeclarationRank(b) || a.at.localeCompare(b.at));
+}
+
+const OFFICIAL_SECTION_NOTE =
+  "Federal emergency and major disaster declarations under the Stafford Act, plus state and local declarations from government sources.";
+const OTHER_SECTION_NOTE =
+  "Press coverage, disaster requests, and other early signals (damage, local emergencies, governor requests for federal aid) to keep on the radar.";
+const VERIFY_SECTION_NOTE = "Which official endpoints posted new items and whether automated checks succeeded.";
+
+function alertTextLines(a: AlertRow, i: number, tz: string): string[] {
+  return [
+    `${i + 1}. ${alertLabel(a)}`,
+    `   ${a.title}`,
+    `   ${a.source_name}, ${a.official ? "official source" : "press report"}, ${formatTime(a.at, tz, { hour: "numeric", minute: "2-digit" })}`,
+    ...(a.url ? [`   ${a.url}`] : []),
+  ];
+}
+
+function alertHtmlItem(a: AlertRow, tz: string): string {
+  return `<li style="margin-bottom:10px"><strong>${escapeHtml(alertLabel(a))}</strong><br>${
+    a.url ? `<a href="${escapeHtml(a.url)}">${escapeHtml(a.title)}</a>` : escapeHtml(a.title)
+  }<br><span style="color:#555">${escapeHtml(a.source_name)}, ${a.official ? "official source" : "press report"}, ${escapeHtml(
+    formatTime(a.at, tz, { hour: "numeric", minute: "2-digit" }),
+  )}</span></li>`;
+}
+
 function activityLine(a: SourceActivity): string {
   const parts = [plural(a.newItems, "new item")];
   if (a.detections) parts.push(plural(a.detections, "declaration match"));
@@ -102,6 +149,8 @@ function wrap(words: string[], width = 76, indent = "  "): string {
 /** The end-of-day summary: did anything get declared, and which endpoints posted anything at all. */
 export function buildDigest(store: Store, sources: Source[], since: string, until: string, tz = config.digest.tz): Digest {
   const alerts = store.alertsBetween(since, until).filter((a) => alertWanted(a.type, a.status, a.state));
+  const officialAlerts = sortOfficialDeclarations(alerts.filter(isOfficialDeclaration));
+  const otherAlerts = alerts.filter((a) => !isOfficialDeclaration(a));
   const activity = store.activityBetween(since, until);
 
   const endpoints: Endpoint[] = sources
@@ -139,18 +188,18 @@ export function buildDigest(store: Store, sources: Source[], since: string, unti
     answer,
     endpointSummary,
     "",
-    ...(alerts.length
-      ? [
-          "ALERTS",
-          ...alerts.flatMap((a, i) => [
-            `${i + 1}. ${alertLabel(a)}`,
-            `   ${a.title}`,
-            `   ${a.source_name}, ${a.official ? "official source" : "press report"}, ${formatTime(a.at, tz, { hour: "numeric", minute: "2-digit" })}`,
-            ...(a.url ? [`   ${a.url}`] : []),
-          ]),
-          "",
-        ]
-      : []),
+    "1. OFFICIAL DISASTER DECLARATIONS",
+    OFFICIAL_SECTION_NOTE,
+    ...(officialAlerts.length ? officialAlerts.flatMap((a, i) => alertTextLines(a, i, tz)) : ["  None in this window."]),
+    "",
+    "2. OTHER EVIDENCE & NEWS",
+    OTHER_SECTION_NOTE,
+    ...(otherAlerts.length ? otherAlerts.flatMap((a, i) => alertTextLines(a, i, tz)) : ["  None in this window."]),
+    ...(newsSummary ? ["", newsSummary] : []),
+    "",
+    "3. SOURCE EVIDENCE / VERIFICATION",
+    VERIFY_SECTION_NOTE,
+    "",
     `POSTED SOMETHING NEW (${active.length})`,
     ...(active.length ? active.map((e) => `  ${e.id}  ${e.name}: ${activityLine(e.activity)}`) : ["  none"]),
     "",
@@ -159,8 +208,6 @@ export function buildDigest(store: Store, sources: Source[], since: string, unti
       : []),
     `NOTHING NEW (${quiet.length})`,
     wrap(quiet.map((e) => e.id)),
-    "",
-    newsSummary,
   ].join("\n");
 
   const rows = [...active, ...troubled.filter((e) => !isActive(e)), ...quiet];
@@ -169,20 +216,23 @@ export function buildDigest(store: Store, sources: Source[], since: string, unti
 <html><head><meta charset="utf-8"></head><body style="font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;font-size:14px;color:#111;max-width:760px">
 <p style="font-size:18px;font-weight:600;margin:0 0 4px">${escapeHtml(answer)}</p>
 <p style="margin:0 0 16px;color:#444">${escapeHtml(endpointSummary)}</p>
+<h3 style="margin:16px 0 4px">1. Official disaster declarations</h3>
+<p style="margin:0 0 8px;color:#555;font-size:13px">${escapeHtml(OFFICIAL_SECTION_NOTE)}</p>
 ${
-  alerts.length
-    ? `<h3 style="margin:16px 0 8px">Alerts</h3><ol style="padding-left:20px">${alerts
-        .map(
-          (a) => `<li style="margin-bottom:10px"><strong>${escapeHtml(alertLabel(a))}</strong><br>${
-            a.url ? `<a href="${escapeHtml(a.url)}">${escapeHtml(a.title)}</a>` : escapeHtml(a.title)
-          }<br><span style="color:#555">${escapeHtml(a.source_name)}, ${a.official ? "official source" : "press report"}, ${escapeHtml(
-            formatTime(a.at, tz, { hour: "numeric", minute: "2-digit" }),
-          )}</span></li>`,
-        )
-        .join("")}</ol>`
-    : ""
+  officialAlerts.length
+    ? `<ol style="padding-left:20px;margin:0 0 16px">${officialAlerts.map((a) => alertHtmlItem(a, tz)).join("")}</ol>`
+    : `<p style="margin:0 0 16px;color:#888">None in this window.</p>`
 }
-<h3 style="margin:16px 0 8px">Official endpoints</h3>
+<h3 style="margin:16px 0 4px">2. Other evidence &amp; news</h3>
+<p style="margin:0 0 8px;color:#555;font-size:13px">${escapeHtml(OTHER_SECTION_NOTE)}</p>
+${
+  otherAlerts.length
+    ? `<ol style="padding-left:20px;margin:0 0 8px">${otherAlerts.map((a) => alertHtmlItem(a, tz)).join("")}</ol>`
+    : `<p style="margin:0 0 8px;color:#888">None in this window.</p>`
+}
+${newsSummary ? `<p style="margin:0 0 16px;color:#444">${escapeHtml(newsSummary)}</p>` : ""}
+<h3 style="margin:16px 0 4px">3. Source evidence / verification</h3>
+<p style="margin:0 0 8px;color:#555;font-size:13px">${escapeHtml(VERIFY_SECTION_NOTE)}</p>
 <table style="border-collapse:collapse;width:100%">
 <tr><th style="${cell}">Endpoint</th><th style="${cell}">New activity</th><th style="${cell}">New items</th><th style="${cell}">Declaration matches</th><th style="${cell}">Status</th></tr>
 ${rows
@@ -193,18 +243,32 @@ ${rows
   })
   .join("\n")}
 </table>
-${newsSummary ? `<p style="margin-top:16px;color:#444">${escapeHtml(newsSummary)}</p>` : ""}
 </body></html>`;
 
-  return { subject, text, html, alertCount: alerts.length };
+  const digest = { subject, text, html, alertCount: alerts.length };
+  return withGmailRefreshNotice(digest, store);
+}
+
+/** Builds the digest and probes Gmail so refresh-needed banners reflect current auth. */
+export async function buildDigestAsync(store: Store, sources: Source[], since: string, until: string, tz = config.digest.tz): Promise<Digest> {
+  await probeGmailAuth(store);
+  return buildDigest(store, sources, since, until, tz);
 }
 
 export function digestConfigured(): boolean {
   return mailConfigured() && config.digest.to.length > 0;
 }
 
-export async function sendDigest(d: Digest): Promise<void> {
-  await sendEmail(config.digest.to, d, config.digest.cc);
+export async function sendDigest(d: Digest, store?: Store): Promise<void> {
+  try {
+    await sendEmail(config.digest.to, d, config.digest.cc);
+  } catch (err) {
+    if (store) {
+      const { isGmailRefreshError, markGmailRefreshNeeded } = await import("./gmail-refresh.ts");
+      if (isGmailRefreshError(err)) markGmailRefreshNeeded(store);
+    }
+    throw err;
+  }
 }
 
 /** Calendar date and minutes past midnight in a time zone. */
@@ -251,8 +315,8 @@ export function startDigestSchedule(store: Store, sources: Source[]): () => void
     const since = store.getMeta("digest_until")!;
     const until = now.toISOString();
     try {
-      const digest = buildDigest(store, sources, since, until);
-      await sendDigest(digest);
+      const digest = await buildDigestAsync(store, sources, since, until);
+      await sendDigest(digest, store);
       store.setMeta("digest_until", until);
       store.setMeta("digest_date", clock.date);
       store.pruneStats(new Date(now.getTime() - 40 * 86400_000).toISOString());
@@ -268,6 +332,8 @@ export function startDigestSchedule(store: Store, sources: Source[]): () => void
     } catch (err) {
       retryAt = now.getTime() + 15 * 60_000;
       const message = err instanceof Error ? err.message : String(err);
+      const { isGmailRefreshError, markGmailRefreshNeeded } = await import("./gmail-refresh.ts");
+      if (isGmailRefreshError(err)) markGmailRefreshNeeded(store);
       console.error(`[digest] send failed, retrying in 15 min: ${message}`);
       await reportWatchRun({
         externalId: `daily:${clock.date}:send:${until}`,

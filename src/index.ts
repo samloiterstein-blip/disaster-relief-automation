@@ -1,7 +1,8 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { config } from "./config.ts";
-import { buildDigest, digestConfigured, localClock, parseTime, sendDigest, startDigestSchedule } from "./digest.ts";
+import { buildDigestAsync, digestConfigured, localClock, parseTime, sendDigest, startDigestSchedule } from "./digest.ts";
+import { isGmailRefreshError, markGmailRefreshNeeded } from "./gmail-refresh.ts";
 import { networkUp } from "./http.ts";
 import { authorizeGmail } from "./gmail-auth.ts";
 import { mailConfigured, sendEmail } from "./mail.ts";
@@ -84,7 +85,7 @@ if (args.has("--daily")) {
     const alerts = await scheduler.runAll();
     const until = new Date().toISOString();
     const since = store.getMeta("digest_until") ?? new Date(Date.now() - 86400_000).toISOString();
-    const digest = buildDigest(store, sources, since, until);
+    const digest = await buildDigestAsync(store, sources, since, until);
     const failedSources = [...scheduler.health.values()].filter((h) => h.consecutiveErrors > 0);
     const openFemaDown = failedSources.some((h) => h.id.startsWith("openfema"));
     const status = openFemaDown ? "failed" : failedSources.length ? "degraded" : "succeeded";
@@ -104,9 +105,10 @@ if (args.has("--daily")) {
     }
     for (let attempt = 1; ; attempt++) {
       try {
-        await sendDigest(digest);
+        await sendDigest(digest, store);
         break;
       } catch (err) {
+        if (isGmailRefreshError(err)) markGmailRefreshNeeded(store);
         if (attempt === 3) throw err;
         console.error(`[daily] send attempt ${attempt} failed, retrying in 30s: ${err instanceof Error ? err.message : err}`);
         await new Promise((r) => setTimeout(r, 30_000));
@@ -143,14 +145,14 @@ if (args.has("--digest") || args.has("--digest-preview")) {
   // Ad hoc digest covering everything since the last scheduled one (or the last 24 hours). Doesn't move the schedule's window.
   const until = new Date().toISOString();
   const since = store.getMeta("digest_until") ?? new Date(Date.now() - 86400_000).toISOString();
-  const digest = buildDigest(store, sources, since, until);
+  const digest = await buildDigestAsync(store, sources, since, until);
   if (args.has("--digest-preview")) {
     const file = join(config.dataDir, "digest-preview.html");
     writeFileSync(file, digest.html);
     console.log(`Subject: ${digest.subject}\n\n${digest.text}\n\nHTML version: ${file}`);
   } else {
     if (!digestConfigured()) throw new Error("Configure email (MAIL_PROVIDER=gmail with GMAIL_* settings, or SMTP_*) and set DIGEST_TO to send the digest.");
-    await sendDigest(digest);
+    await sendDigest(digest, store);
     console.log(`Sent "${digest.subject}" to ${config.digest.to.join(", ")}`);
   }
   process.exit(0);

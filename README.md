@@ -60,14 +60,13 @@ HTTP endpoints (default port 8787):
 
 Alongside the real-time alerts, the service emails one end-of-day summary at `DIGEST_TIME` in `DIGEST_TZ` (default 17:00 America/New_York). Set `DIGEST_TO` and an email provider in `.env` to turn it on:
 
-- **Gmail API:** set `MAIL_PROVIDER=gmail`, `GMAIL_CLIENT_ID`, and `GMAIL_CLIENT_SECRET`, then run `node src/index.ts --gmail-auth` once. It opens Google sign-in, asks only to send mail, and saves the refresh token to `.env`. If the OAuth app's publishing status is "Testing", Google expires the token after 7 days; set it to "In production" to keep it.
+- **Gmail API:** set `MAIL_PROVIDER=gmail`, `GMAIL_CLIENT_ID`, and `GMAIL_CLIENT_SECRET`, then run `npm run gmail-refresh` (or `node src/index.ts --gmail-auth` for sign-in only). The refresh script opens Google sign-in, saves the token to `.env`, updates the GitHub `GMAIL_REFRESH_TOKEN` secret, and re-runs the daily workflow. If the OAuth app's publishing status is "Testing", Google expires the token after 7 days; set it to "In production" to keep it. When Gmail auth fails, digests for the next **48 hours** include a top-of-email banner with the same `npm run gmail-refresh` instructions.
 - **SMTP:** set `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, and `SMTP_PASS`.
 
 - **Subject:** the yes/no answer, such as `Disaster watch Thu, Oct 1: YES, 2 new declarations, 1 request` or `Disaster watch Thu, Oct 1: no new declarations`.
-- **Alerts:** every alert since the last digest, filtered by `WATCH_STATES` and `ALERT_STATUSES` the same way Slack is.
-- **Official endpoints:** a Yes/No row for each of the government endpoints. "Yes" means it listed at least one item it hadn't listed before, or something it posted matched a declaration. Items already present when a source was first watched don't count.
-- **Status:** each endpoint is marked `ok`, `unreliable` (more than 25% of checks failed), or `down` (no check succeeded), with the last error. A "No" from a down endpoint means it couldn't be checked, not that nothing was posted.
-- **News searches:** one line with the number of new articles and declaration matches.
+- **1. Official disaster declarations:** Stafford Act emergency and major disaster declarations, confirmations, expansions, and other government-posted declarations (federal items listed first). Filtered by `WATCH_STATES` and `ALERT_STATUSES` the same way Slack is.
+- **2. Other evidence & news:** press coverage, disaster requests, and other early signals (damage, local emergencies, governor requests for federal aid). Includes a line on news-search volume and declaration matches.
+- **3. Source evidence / verification:** a Yes/No row for each government endpoint. "Yes" means it listed at least one item it hadn't listed before, or something it posted matched a declaration. Items already present when a source was first watched don't count. Each endpoint is marked `ok`, `unreliable` (more than 25% of checks failed), or `down` (no check succeeded), with the last error. A "No" from a down endpoint means it couldn't be checked, not that nothing was posted.
 
 Each digest covers the time since the previous one was sent, so a restart or a failed send doesn't leave a gap. A failed send retries every 15 minutes. On first start, the window begins at that moment. If that day's send time has already passed, the first digest goes out the next day.
 

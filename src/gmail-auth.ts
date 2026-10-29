@@ -52,12 +52,20 @@ export async function authorizeGmail(): Promise<string> {
     server.on("error", reject);
     server.listen(PORT, "127.0.0.1", () => {
       console.log(`Opening Google sign-in in your browser. If it doesn't open, visit:\n${url}\n`);
-      spawn(process.platform === "darwin" ? "open" : "xdg-open", [url.toString()], { detached: true, stdio: "ignore" }).unref();
+      // cmd.exe treats `&` in URLs as command separators unless the URL is quoted.
+      const open =
+        process.platform === "win32"
+          ? spawn("powershell", ["-NoProfile", "-Command", `Start-Process -Uri '${url.toString().replace(/'/g, "''")}'`], {
+              detached: true,
+              stdio: "ignore",
+            })
+          : spawn(process.platform === "darwin" ? "open" : "xdg-open", [url.toString()], { detached: true, stdio: "ignore" });
+      open.unref();
     });
     setTimeout(() => {
       server.close();
-      reject(new Error("Gmail authorization timed out after 5 minutes."));
-    }, 5 * 60_000).unref();
+      reject(new Error("Gmail authorization timed out after 15 minutes."));
+    }, 15 * 60_000).unref();
   });
 
   const res = await fetch("https://oauth2.googleapis.com/token", {
@@ -73,5 +81,6 @@ export async function authorizeGmail(): Promise<string> {
   setEnv("GMAIL_REFRESH_TOKEN", token.refresh_token);
   setEnv("MAIL_PROVIDER", "gmail");
   if (info.email && !config.digest.from) setEnv("DIGEST_FROM", info.email);
+  console.log("Next: run `npm run gmail-refresh` to push this token to GitHub and re-send the daily digest (or run push step only with --no-dispatch).");
   return info.email ?? "unknown account";
 }

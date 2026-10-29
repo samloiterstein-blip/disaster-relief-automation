@@ -11,6 +11,7 @@
     "start": "node src/index.ts",
     "once": "node src/index.ts --once",
     "test": "node --test test/*.test.ts",
+    "gmail-refresh": "node scripts/refresh-gmail-token.mjs",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

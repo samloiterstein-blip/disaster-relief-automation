@@ -61,11 +61,15 @@ test("digest answers yes/no and sorts endpoints by activity and health", async (
   assert.match(d.subject, /: YES, 1 new declaration$/);
   assert.equal(d.alertCount, 1);
   assert.match(d.text, /^YES\. 1 alert \(1 new declaration\)/);
-  assert.match(d.text, /New: State emergency declaration, Florida\n {3}Governor DeSantis Declares/);
-  assert.match(d.text, /POSTED SOMETHING NEW \(1\)\n {2}fl-press {2}fl-press name: 1 new item, 1 declaration match\n/);
+  assert.match(d.text, /1\. OFFICIAL DISASTER DECLARATIONS[\s\S]*New: State emergency declaration, Florida\n {3}Governor DeSantis Declares/);
+  assert.match(d.text, /2\. OTHER EVIDENCE & NEWS[\s\S]*None in this window\./);
+  assert.match(d.text, /3\. SOURCE EVIDENCE \/ VERIFICATION[\s\S]*POSTED SOMETHING NEW \(1\)\n {2}fl-press {2}fl-press name: 1 new item, 1 declaration match\n/);
   assert.match(d.text, /DOWN OR UNRELIABLE \(1\)\n {2}ar-press {2}ar-press name: down, 0 of 2 checks succeeded\. Last error: HTTP 403/);
-  assert.match(d.text, /NOTHING NEW \(1\)\n {2}ga-orders\n/);
+  assert.match(d.text, /NOTHING NEW \(1\)\n {2}ga-orders/);
   assert.match(d.text, /News searches: 2 new articles across 1 search, 0 declaration matches\./);
+  assert.match(d.html, /1\. Official disaster declarations/);
+  assert.match(d.html, /2\. Other evidence &amp; news/);
+  assert.match(d.html, /3\. Source evidence \/ verification/);
   assert.match(d.html, /<td[^>]*>Yes<\/td>/);
 
   const later = buildDigest(store, sources, until, new Date(Date.now() + 2000).toISOString(), "America/New_York");
