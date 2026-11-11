@@ -20,7 +20,7 @@ test("refresh notice is shown for 48 hours after the flag is set", () => {
 });
 
 test("reminder is due 12 hours before the 7-day expiry", async () => {
-  const { gmailRefreshReminderDueAt, isGmailRefreshReminderDue, gmailRefreshCursorPrompt, gmailRefreshReminderIssueBody } = await import("../src/gmail-refresh.ts");
+  const { gmailRefreshReminderDueAt, isGmailRefreshReminderDue, gmailRefreshCursorPrompt, gmailRefreshReminderIssueBody } = await import("../src/gmail-reminder.ts");
   const refreshed = new Date("2026-11-11T01:46:12Z");
   const due = gmailRefreshReminderDueAt(refreshed);
   assert.equal(due.toISOString(), "2026-11-17T13:46:12.000Z");

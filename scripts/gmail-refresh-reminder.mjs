@@ -15,7 +15,7 @@ import {
   gmailRefreshReminderDueAt,
   gmailRefreshReminderIssueBody,
   isGmailRefreshReminderDue,
-} from "../src/gmail-refresh.ts";
+} from "../src/gmail-reminder.ts";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const repo = process.env.GITHUB_REPOSITORY || GMAIL_REFRESH_REPO;
